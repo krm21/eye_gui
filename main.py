@@ -1,6 +1,7 @@
 import tkinter as tk
-from tkinter import PhotoImage, ttk
+from tkinter import PhotoImage, Variable, ttk
 from tkinter import filedialog as fd
+from tkinter.font import Font
 
 import PIL
 from PIL import Image
@@ -8,29 +9,54 @@ from filter import bacon
 
 class MainWindow:
     def __init__(self, root):
-        self.label = ttk.Label(root, text="dupa")
+        self.label = ttk.Label(root)
         self.label.pack(side=tk.LEFT)
         r = ttk.Frame(root)
         r.config(padding=(10, 10, 10, 10))
         r.pack(side=tk.RIGHT)
 
         self.b1 = tk.Button(r, text="Open an image...", command=self.select_file)
-        self.b1.grid(row=0, column=1)
-        self.s1 = tk.Scale(r, from_=0, to=20, orient=tk.HORIZONTAL, length=300, label="blur", command=lambda x: self.handle_slide())
-        self.s1.grid(row=1, column=1)
-        self.s1.set(1)
-        self.s2 = tk.Scale(r, from_=0, to=20, orient=tk.HORIZONTAL, length=300, label="contrast", command=lambda x: self.handle_slide())
-        self.s2.grid(row=2, column=1)
-        self.s2.set(1)
-        self.s3 = tk.Scale(r, from_=0, to=5, orient=tk.HORIZONTAL, length=300, label="brightness", command=lambda x: self.handle_slide())
-        self.s3.grid(row=3, column=1)
-        self.s3.set(1)
-        self.s4 = tk.Scale(r, from_=0, to=30, orient=tk.HORIZONTAL, length=300, label="lower sigma", command=lambda x: self.handle_slide())
-        self.s4.set(2)
-        self.s4.grid(row=4, column=1)
-        self.s5 = tk.Scale(r, from_=0, to=30, orient=tk.HORIZONTAL, length=300, label="upper sigma", command=lambda x: self.handle_slide())
-        self.s5.set(20)
-        self.s5.grid(row=5, column=1)
+        self.b1.grid(row=0, column=0, pady=5, columnspan=2)
+
+        self.blur_var = tk.IntVar(root)
+        self.blur_var.set(1)
+        self.l1 = tk.Label(r, text="blur")
+        self.l1.grid(row=1, column=0, sticky=tk.W)
+        self.s1 = tk.Spinbox(r, from_=0, to=20, command=lambda: self.handle_slide(), width=3, textvariable=self.blur_var,
+            font=Font(size=12))
+        self.s1.grid(row=1, column=1, pady=5)
+        
+        self.contrast_var = tk.IntVar(root)
+        self.contrast_var.set(1)
+        self.l2 = tk.Label(r, text="contrast")
+        self.l2.grid(row=2, column=0, sticky=tk.W)
+        self.s2 = tk.Spinbox(r, from_=0, to=20, command=lambda: self.handle_slide(), width=3, textvariable=self.contrast_var,
+            font=Font(size=12))
+        self.s2.grid(row=2, column=1, pady=5)
+        
+        self.brightness_var = tk.IntVar(root)
+        self.brightness_var.set(1)
+        self.l3 = tk.Label(r, text="brightness")
+        self.l3.grid(row=3, column=0, sticky=tk.W)
+        self.s3 = tk.Spinbox(r, from_=0, to=10, command=lambda: self.handle_slide(), width=3, textvariable=self.brightness_var,
+            font=Font(size=12))
+        self.s3.grid(row=3, column=1, pady=5)
+        
+        self.sigma_lower_var = tk.IntVar(root)
+        self.sigma_lower_var.set(1)
+        self.l4 = tk.Label(r, text="sigma lower")
+        self.l4.grid(row=4, column=0, sticky=tk.W)
+        self.s4 = tk.Spinbox(r, from_=0, to=30, command=lambda: self.handle_slide(), width=3, textvariable=self.sigma_lower_var,
+            font=Font(size=12))
+        self.s4.grid(row=4, column=1, pady=5)
+        
+        self.sigma_upper_var = tk.IntVar(root)
+        self.sigma_upper_var.set(20)
+        self.l5 = tk.Label(r, text="sigma upper")
+        self.l5.grid(row=5, column=0, sticky=tk.W)
+        self.s5 = tk.Spinbox(r, from_=0, to=30, command=lambda: self.handle_slide(), width=3, textvariable=self.sigma_upper_var,
+            font=Font(size=12))
+        self.s5.grid(row=5, column=1, pady=5)
 
     def select_file(self):
         self.filename = fd.askopenfilename(
@@ -39,16 +65,16 @@ class MainWindow:
 
         self.image = Image.open(self.filename)
 
-        self.pic = bacon(self.image, self.s1.get(), self.s2.get(), self.s3.get(), self.s4.get(), self.s5.get())
+        self.pic = bacon(self.image, self.blur_var.get(), self.contrast_var.get(), self.brightness_var.get(), self.sigma_lower_var.get(), self.sigma_upper_var.get())
 
         self.label.config(image=self.pic)
         
     def handle_slide(self):
-        blur = self.s1.get()
-        contrast = self.s2.get()
-        brightness = self.s3.get()
-        lower_sigma = self.s4.get()
-        upper_sigma = self.s5.get()
+        blur = self.blur_var.get()
+        contrast = self.contrast_var.get()
+        brightness = self.brightness_var.get()
+        lower_sigma = self.sigma_lower_var.get()
+        upper_sigma = self.sigma_upper_var.get()
 
         self.processed_img = bacon(self.image, blur, contrast, brightness, lower_sigma, upper_sigma)
 
@@ -56,5 +82,6 @@ class MainWindow:
 
 if __name__ == '__main__': 
     root = tk.Tk()
+    root.geometry("800x600")
     MainWindow(root)
     root.mainloop()
