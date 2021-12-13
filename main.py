@@ -25,6 +25,7 @@ class MainWindow:
         self.s1 = tk.Spinbox(r, from_=0, to=20, command=lambda: self.handle_slide(), width=3, textvariable=self.blur_var,
             font=Font(size=12), state=tk.DISABLED)
         self.s1.grid(row=1, column=1, pady=5)
+        self.s1.bind('<Return>', lambda x: self.handle_slide())
         
         self.contrast_var = tk.IntVar(root)
         self.contrast_var.set(1)
@@ -33,6 +34,8 @@ class MainWindow:
         self.s2 = tk.Spinbox(r, from_=0, to=20, command=lambda: self.handle_slide(), width=3, textvariable=self.contrast_var,
             font=Font(size=12), state=tk.DISABLED)
         self.s2.grid(row=2, column=1, pady=5)
+        self.s2.bind('<Return>', lambda x: self.handle_slide())
+
         
         self.brightness_var = tk.IntVar(root)
         self.brightness_var.set(1)
@@ -41,6 +44,8 @@ class MainWindow:
         self.s3 = tk.Spinbox(r, from_=0, to=10, command=lambda: self.handle_slide(), width=3, textvariable=self.brightness_var,
             font=Font(size=12), state=tk.DISABLED)
         self.s3.grid(row=3, column=1, pady=5)
+        self.s3.bind('<Return>', lambda x: self.handle_slide())
+
         
         self.sigma_lower_var = tk.IntVar(root)
         self.sigma_lower_var.set(1)
@@ -49,6 +54,8 @@ class MainWindow:
         self.s4 = tk.Spinbox(r, from_=0, to=30, command=lambda: self.handle_slide(), width=3, textvariable=self.sigma_lower_var,
             font=Font(size=12), state=tk.DISABLED)
         self.s4.grid(row=4, column=1, pady=5)
+        self.s4.bind('<Return>', lambda x: self.handle_slide())
+
         
         self.sigma_upper_var = tk.IntVar(root)
         self.sigma_upper_var.set(20)
@@ -57,6 +64,7 @@ class MainWindow:
         self.s5 = tk.Spinbox(r, from_=0, to=30, command=lambda: self.handle_slide(), width=3, textvariable=self.sigma_upper_var,
             font=Font(size=12), state=tk.DISABLED)
         self.s5.grid(row=5, column=1, pady=5)
+        self.s5.bind('<Return>', lambda x: self.handle_slide())
 
         self.edge_var = tk.IntVar(root)
         self.edge_var.set(0)
@@ -65,6 +73,7 @@ class MainWindow:
         self.s6 = tk.Spinbox(r, from_=0, to=30, command=lambda: self.handle_slide(), width=3, textvariable=self.edge_var,
             font=Font(size=12), state=tk.DISABLED)
         self.s6.grid(row=6, column=1, pady=5)
+        self.s6.bind('<Return>', lambda x: self.handle_slide())
 
         self.inverse_var = tk.BooleanVar(root)
         self.l7 = tk.Label(r, text="inverse colors")
