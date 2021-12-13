@@ -2,11 +2,22 @@ import sys
 import os
 
 from PIL import Image, ImageFilter, ImageOps, ImageEnhance, ImageTk
-from skimage.filters import frangi
+from skimage.filters import frangi, sato, meijering, hessian
 import numpy as np
 from imageio import imwrite
 
-def bacon(img, blur, contrast, brightness, sigma_low, sigma_high, edge_enhence, inverse):
+def get_function(funcname: str):
+    functions = {
+        'Frangi': frangi,
+        'Sato': sato,
+        'Meijering': meijering,
+        'Hessian': hessian,
+    }
+
+    return functions[funcname]
+
+def bacon(img, blur, contrast, brightness, sigma_low, sigma_high, edge_enhence, inverse, funcname):
+    func = get_function(funcname)
     img_gray = ImageOps.grayscale(img)
 
     if inverse:
@@ -26,7 +37,7 @@ def bacon(img, blur, contrast, brightness, sigma_low, sigma_high, edge_enhence, 
 
     img_np = np.array(img_edge)
 
-    img_frangi = frangi(img_np, sigmas=range(sigma_low, sigma_high))
+    img_frangi = func(img_np, sigmas=range(sigma_low, sigma_high))
     # img_frangi = frangi(img_np, sigmas=range(1, 10))
 
     normalized_img = (img_frangi/np.max(img_frangi)*255).astype(np.uint8)

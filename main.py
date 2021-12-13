@@ -72,6 +72,18 @@ class MainWindow:
         self.c1 = tk.Checkbutton(r, variable=self.inverse_var, state=tk.DISABLED, command=lambda: self.handle_slide())
         self.c1.grid(row=7, column=1)
 
+        self.filter_var = tk.StringVar(root)
+        self.f1 = ttk.OptionMenu(r, self.filter_var,
+            "Frangi",
+            "Frangi",
+            "Sato",
+            "Meijering",
+            "Hessian",
+            command=lambda x: self.handle_slide(),
+        )
+        self.f1.configure(state='disabled')
+        self.f1.grid(row=8, column=0, columnspan=2)
+
     def select_file(self):
         self.filename = fd.askopenfilename(
             title='Open a file',
@@ -82,7 +94,7 @@ class MainWindow:
 
         self.image = Image.open(self.filename)
 
-        self.pic = bacon(self.image, self.blur_var.get(), self.contrast_var.get(), self.brightness_var.get(), self.sigma_lower_var.get(), self.sigma_upper_var.get(), self.edge_var.get(), self.inverse_var.get())
+        self.pic = bacon(self.image, self.blur_var.get(), self.contrast_var.get(), self.brightness_var.get(), self.sigma_lower_var.get(), self.sigma_upper_var.get(), self.edge_var.get(), self.inverse_var.get(), self.filter_var.get())
 
         self.label.config(image=self.pic)
         
@@ -94,8 +106,9 @@ class MainWindow:
         upper_sigma = self.sigma_upper_var.get()
         edge = self.edge_var.get()
         inverse = self.inverse_var.get()
+        filter = self.filter_var.get()
 
-        self.processed_img = bacon(self.image, blur, contrast, brightness, lower_sigma, upper_sigma, edge, inverse)
+        self.processed_img = bacon(self.image, blur, contrast, brightness, lower_sigma, upper_sigma, edge, inverse, filter)
 
         self.label.config(image=self.processed_img)
 
@@ -107,6 +120,7 @@ class MainWindow:
         self.s5.config(state=tk.NORMAL)
         self.s6.config(state=tk.NORMAL)
         self.c1.config(state=tk.NORMAL)
+        self.f1.configure(state='normal')
 
 
 if __name__ == '__main__': 
