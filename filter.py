@@ -2,7 +2,7 @@ import sys
 import os
 
 from PIL import Image, ImageFilter, ImageOps, ImageEnhance, ImageTk
-from skimage.filters import frangi, sato, meijering, hessian
+from skimage.filters import frangi, sato, meijering, hessian, threshold_otsu
 import numpy as np
 from imageio import imwrite
 
@@ -16,7 +16,16 @@ def get_function(funcname: str):
 
     return functions[funcname]
 
-def bacon(img, blur, contrast, brightness, sigma_low, sigma_high, edge_enhence, inverse, funcname):
+def img_to_binary(img):
+    gray_img = img.convert('L')
+    numpy_img = np.asarray(gray_img)
+    thresh = threshold_otsu(numpy_img)
+    bi_array = ((numpy_img>thresh)*255).astype(np.uint8)
+
+    bi_img = Image.fromarray(bi_array)
+    return bi_img
+
+def bacon(img, blur, contrast, brightness, sigma_low, sigma_high, edge_enhence, inverse, threshold, funcname):
     func = get_function(funcname)
     img_gray = ImageOps.grayscale(img)
 
@@ -25,8 +34,13 @@ def bacon(img, blur, contrast, brightness, sigma_low, sigma_high, edge_enhence, 
     else:
         img_invert = img_gray
 
+    if threshold:
+        img_binary = img_to_binary(img_invert)
+    else:
+        img_binary = img_invert
+
     # img_gray.show()
-    img_blur = img_invert.filter(ImageFilter.BoxBlur(blur))
+    img_blur = img_binary.filter(ImageFilter.BoxBlur(blur))
 
     # img_blur.show()
     img_contrast = ImageEnhance.Contrast(img_blur).enhance(contrast)

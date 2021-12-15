@@ -81,6 +81,12 @@ class MainWindow:
         self.c1 = tk.Checkbutton(r, variable=self.inverse_var, state=tk.DISABLED, command=lambda: self.handle_slide())
         self.c1.grid(row=7, column=1)
 
+        self.threshold_var = tk.BooleanVar(root)
+        self.l8 = tk.Label(r, text="otsu threshold")
+        self.l8.grid(row=8, column=0, sticky=tk.W)
+        self.c2 = tk.Checkbutton(r, variable=self.threshold_var, state=tk.DISABLED, command=lambda: self.handle_slide())
+        self.c2.grid(row=8, column=1)
+
         self.filter_var = tk.StringVar(root)
         self.f1 = ttk.OptionMenu(r, self.filter_var,
             "Frangi",
@@ -91,7 +97,7 @@ class MainWindow:
             command=lambda x: self.handle_slide(),
         )
         self.f1.configure(state='disabled')
-        self.f1.grid(row=8, column=0, columnspan=2)
+        self.f1.grid(row=9, column=0, columnspan=2)
 
     def select_file(self):
         self.filename = fd.askopenfilename(
@@ -103,7 +109,7 @@ class MainWindow:
 
         self.image = Image.open(self.filename)
 
-        self.pic = bacon(self.image, self.blur_var.get(), self.contrast_var.get(), self.brightness_var.get(), self.sigma_lower_var.get(), self.sigma_upper_var.get(), self.edge_var.get(), self.inverse_var.get(), self.filter_var.get())
+        self.pic = bacon(self.image, self.blur_var.get(), self.contrast_var.get(), self.brightness_var.get(), self.sigma_lower_var.get(), self.sigma_upper_var.get(), self.edge_var.get(), self.inverse_var.get(), self.threshold_var.get(), self.filter_var.get())
 
         self.label.config(image=self.pic)
         
@@ -115,9 +121,10 @@ class MainWindow:
         upper_sigma = self.sigma_upper_var.get()
         edge = self.edge_var.get()
         inverse = self.inverse_var.get()
+        threshold = self.threshold_var.get()
         filter = self.filter_var.get()
 
-        self.processed_img = bacon(self.image, blur, contrast, brightness, lower_sigma, upper_sigma, edge, inverse, filter)
+        self.processed_img = bacon(self.image, blur, contrast, brightness, lower_sigma, upper_sigma, edge, inverse, threshold, filter)
 
         self.label.config(image=self.processed_img)
 
@@ -129,6 +136,7 @@ class MainWindow:
         self.s5.config(state=tk.NORMAL)
         self.s6.config(state=tk.NORMAL)
         self.c1.config(state=tk.NORMAL)
+        self.c2.config(state=tk.NORMAL)
         self.f1.configure(state='normal')
 
 
