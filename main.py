@@ -7,88 +7,39 @@ import PIL
 from PIL import Image
 from filter import bacon
 
+
 class MainWindow:
     def __init__(self, root):
         self.label = ttk.Label(root)
         self.label.pack(side=tk.LEFT)
-        r = ttk.Frame(root)
-        r.config(padding=(10, 10, 10, 10))
-        r.pack(side=tk.RIGHT)
+        self.frame = ttk.Frame(root)
+        self.frame.config(padding=(10, 10, 10, 10))
+        self.frame.pack(side=tk.RIGHT)
 
-        self.b1 = tk.Button(r, text="Open an image...", command=self.select_file)
+        self.b1 = tk.Button(self.frame, text="Open an image...", command=self.select_file)
         self.b1.grid(row=0, column=0, pady=5, columnspan=2)
 
-        self.blur_var = tk.IntVar(root)
-        self.blur_var.set(1)
-        self.l1 = tk.Label(r, text="blur")
-        self.l1.grid(row=1, column=0, sticky=tk.W)
-        self.s1 = tk.Spinbox(r, from_=0, to=20, command=lambda: self.handle_slide(), width=3, textvariable=self.blur_var,
-            font=Font(size=12), state=tk.DISABLED)
-        self.s1.grid(row=1, column=1, pady=5)
-        self.s1.bind('<Return>', lambda x: self.handle_slide())
-        
-        self.contrast_var = tk.IntVar(root)
-        self.contrast_var.set(1)
-        self.l2 = tk.Label(r, text="contrast")
-        self.l2.grid(row=2, column=0, sticky=tk.W)
-        self.s2 = tk.Spinbox(r, from_=0, to=20, command=lambda: self.handle_slide(), width=3, textvariable=self.contrast_var,
-            font=Font(size=12), state=tk.DISABLED)
-        self.s2.grid(row=2, column=1, pady=5)
-        self.s2.bind('<Return>', lambda x: self.handle_slide())
-
-        
-        self.brightness_var = tk.IntVar(root)
-        self.brightness_var.set(1)
-        self.l3 = tk.Label(r, text="brightness")
-        self.l3.grid(row=3, column=0, sticky=tk.W)
-        self.s3 = tk.Spinbox(r, from_=0, to=10, command=lambda: self.handle_slide(), width=3, textvariable=self.brightness_var,
-            font=Font(size=12), state=tk.DISABLED)
-        self.s3.grid(row=3, column=1, pady=5)
-        self.s3.bind('<Return>', lambda x: self.handle_slide())
-
-        
-        self.sigma_lower_var = tk.IntVar(root)
-        self.sigma_lower_var.set(1)
-        self.l4 = tk.Label(r, text="sigma lower")
-        self.l4.grid(row=4, column=0, sticky=tk.W)
-        self.s4 = tk.Spinbox(r, from_=0, to=30, command=lambda: self.handle_slide(), width=3, textvariable=self.sigma_lower_var,
-            font=Font(size=12), state=tk.DISABLED)
-        self.s4.grid(row=4, column=1, pady=5)
-        self.s4.bind('<Return>', lambda x: self.handle_slide())
-
-        
-        self.sigma_upper_var = tk.IntVar(root)
-        self.sigma_upper_var.set(20)
-        self.l5 = tk.Label(r, text="sigma upper")
-        self.l5.grid(row=5, column=0, sticky=tk.W)
-        self.s5 = tk.Spinbox(r, from_=0, to=30, command=lambda: self.handle_slide(), width=3, textvariable=self.sigma_upper_var,
-            font=Font(size=12), state=tk.DISABLED)
-        self.s5.grid(row=5, column=1, pady=5)
-        self.s5.bind('<Return>', lambda x: self.handle_slide())
-
-        self.edge_var = tk.IntVar(root)
-        self.edge_var.set(0)
-        self.l6 = tk.Label(r, text="edge enhancement")
-        self.l6.grid(row=6, column=0, sticky=tk.W)
-        self.s6 = tk.Spinbox(r, from_=0, to=30, command=lambda: self.handle_slide(), width=3, textvariable=self.edge_var,
-            font=Font(size=12), state=tk.DISABLED)
-        self.s6.grid(row=6, column=1, pady=5)
-        self.s6.bind('<Return>', lambda x: self.handle_slide())
+        self.s1, self.blur_var = self.add_spinbox("blur", 1, 0, 20, 1)
+        self.s2, self.contrast_var = self.add_spinbox("contrast", 2, 0, 20, 1)
+        self.s3, self.brightness_var = self.add_spinbox("brightness", 3, 0, 10, 1)
+        self.s4, self.sigma_lower_var = self.add_spinbox("sigma lower", 4, 0, 30, 1)
+        self.s5, self.sigma_upper_var = self.add_spinbox("sigma upper", 5, 20, 30, 1)
+        self.s6, self.edge_var = self.add_spinbox("edge enhancement", 6, 0, 20, 1)
 
         self.inverse_var = tk.BooleanVar(root)
-        self.l7 = tk.Label(r, text="inverse colors")
+        self.l7 = tk.Label(self.frame, text="inverse colors")
         self.l7.grid(row=7, column=0, sticky=tk.W)
-        self.c1 = tk.Checkbutton(r, variable=self.inverse_var, state=tk.DISABLED, command=lambda: self.handle_slide())
+        self.c1 = tk.Checkbutton(self.frame, variable=self.inverse_var, state=tk.DISABLED, command=lambda: self.handle_slide())
         self.c1.grid(row=7, column=1)
 
         self.threshold_var = tk.BooleanVar(root)
-        self.l8 = tk.Label(r, text="otsu threshold")
+        self.l8 = tk.Label(self.frame, text="otsu threshold")
         self.l8.grid(row=8, column=0, sticky=tk.W)
-        self.c2 = tk.Checkbutton(r, variable=self.threshold_var, state=tk.DISABLED, command=lambda: self.handle_slide())
+        self.c2 = tk.Checkbutton(self.frame, variable=self.threshold_var, state=tk.DISABLED, command=lambda: self.handle_slide())
         self.c2.grid(row=8, column=1)
 
         self.filter_var = tk.StringVar(root)
-        self.f1 = ttk.OptionMenu(r, self.filter_var,
+        self.f1 = ttk.OptionMenu(self.frame, self.filter_var,
             "Frangi",
             "Frangi",
             "Sato",
@@ -139,6 +90,15 @@ class MainWindow:
         self.c2.config(state=tk.NORMAL)
         self.f1.configure(state='normal')
 
+    def add_spinbox(self, text, row, lower, upper, default):
+        state_var = tk.IntVar(root)
+        state_var.set(default)
+        l = tk.Label(self.frame, text=text)
+        l.grid(row=row, column=0, sticky=tk.W)
+        s = tk.Spinbox(self.frame, from_=lower, to=upper, command=lambda: self.handle_slide(), width=3, textvariable=state_var, font=Font(size=12), state=tk.DISABLED)
+        s.grid(row=row, column=1, pady=5)
+        s.bind('<Return>', lambda x: self.handle_slide())
+        return s, state_var
 
 if __name__ == '__main__': 
     root = tk.Tk()

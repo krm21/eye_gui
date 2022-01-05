@@ -61,8 +61,6 @@ def bacon(img, blur, contrast, brightness, sigma_low, sigma_high, edge_enhence, 
 
     img_lighten = ImageEnhance.Brightness(pil_image).enhance(brightness)
     outimg = img_lighten
-    # print(outimg)
-    # imwrite(f"foo{blur}_{contrast}.png", (outimg/np.max(outimg)*255).astype(np.uint8))
 
     return ImageTk.PhotoImage(image=outimg)
 
