@@ -1,3 +1,5 @@
+import os
+
 import tkinter as tk
 from tkinter import PhotoImage, Variable, ttk
 from tkinter import filedialog as fd
@@ -16,8 +18,11 @@ class MainWindow:
         self.frame.config(padding=(10, 10, 10, 10))
         self.frame.pack(side=tk.RIGHT)
 
-        self.b1 = tk.Button(self.frame, text="Open an image...", command=self.select_file)
-        self.b1.grid(row=0, column=0, pady=5, columnspan=2)
+        self.b1 = tk.Button(self.frame, text="Open image", command=self.select_file)
+        self.b1.grid(row=0, column=0, pady=5)
+
+        self.b2 = tk.Button(self.frame, text="Save image", command=self.save_image, state=tk.DISABLED)
+        self.b2.grid(row=0, column=1, pady=5)
 
         self.s1, self.blur_var = self.add_spinbox("blur", 1, 0, 20, 1)
         self.s2, self.contrast_var = self.add_spinbox("contrast", 2, 0, 20, 1)
@@ -50,20 +55,32 @@ class MainWindow:
         self.f1.configure(state='disabled')
         self.f1.grid(row=9, column=0, columnspan=2)
 
+        self.directory_path = ""
+        self.processed_img = None
+
     def select_file(self):
-        self.filename = fd.askopenfilename(
+        self.filepath = fd.askopenfilename(
             title='Open a file',
             initialdir='.')
 
-        if self.filename:
+        if self.filepath:
             self._enable_spinners()
 
-        self.image = Image.open(self.filename)
 
-        self.pic = bacon(self.image, self.blur_var.get(), self.contrast_var.get(), self.brightness_var.get(), self.sigma_lower_var.get(), self.sigma_upper_var.get(), self.edge_var.get(), self.inverse_var.get(), self.threshold_var.get(), self.filter_var.get())
+        self.directory_path = os.path.dirname(self.filepath)
+        self.filename = os.path.basename(self.filepath)
+        self.image = Image.open(self.filepath)
+
+        self.out_img, self.pic = bacon(self.image, self.blur_var.get(), self.contrast_var.get(), self.brightness_var.get(), self.sigma_lower_var.get(), self.sigma_upper_var.get(), self.edge_var.get(), self.inverse_var.get(), self.threshold_var.get(), self.filter_var.get())
+
+        self.processed_img = self.pic
 
         self.label.config(image=self.pic)
         
+    def save_image(self):
+        file_path = os.path.join(self.directory_path, "out_" + self.filename)
+        self.out_img.save(file_path)
+
     def handle_slide(self):
         blur = self.blur_var.get()
         contrast = self.contrast_var.get()
@@ -75,11 +92,12 @@ class MainWindow:
         threshold = self.threshold_var.get()
         filter = self.filter_var.get()
 
-        self.processed_img = bacon(self.image, blur, contrast, brightness, lower_sigma, upper_sigma, edge, inverse, threshold, filter)
+        self.out_img, self.processed_img = bacon(self.image, blur, contrast, brightness, lower_sigma, upper_sigma, edge, inverse, threshold, filter)
 
         self.label.config(image=self.processed_img)
 
     def _enable_spinners(self):
+        self.b2.config(state=tk.NORMAL)
         self.s1.config(state=tk.NORMAL)
         self.s2.config(state=tk.NORMAL)
         self.s3.config(state=tk.NORMAL)
